@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How-To Guide: DSPM with Microsoft Purview</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h3>Guide Sections</h3>
+            <ul>
+                <li><a href="#introduction">1. What is DSPM?</a></li>
+                <li><a href="#pillars">2. The Pillars of DSPM</a></li>
+                <li><a href="#step1">3. Deploy Purview</a></li>
+                <li><a href="#step2">4. Discover Your Data</a></li>
+                <li><a href="#step3">5. Classify Your Data</a></li>
+                <li><a href="#step4">6. Monitor Your Posture</a></li>
+                <li><a href="#best-practices">7. Best Practices</a></li>
+            </ul>
+        </nav>
+        <main class="content">
+            <header>
+                <h1>A Starter's Guide to Data Security Posture Management (DSPM) in Microsoft Purview</h1>
+                <p class="subtitle">Learn how to discover, classify, and protect your sensitive data across your data estate.</p>
+            </header>
+
+            <section id="introduction">
+                <h2>1. What is Data Security Posture Management (DSPM)?</h2>
+                <p><strong>Data Security Posture Management (DSPM)</strong> is a security discipline focused on answering critical questions about your data: <em>Where is our sensitive data? Who has access to it? How is it being used? And is it secure?</em></p>
+                <p>Unlike traditional security that focuses on perimeters and infrastructure, DSPM focuses on the data itself. It helps you automatically discover unknown data stores, classify sensitive data at scale, and identify security risks like overexposed data or insecure configurations.</p>
+                <p><strong>Microsoft Purview</strong> is Microsoft's unified data governance platform that provides powerful tools to implement a DSPM strategy.</p>
+            </section>
+
+            <section id="pillars">
+                <h2>2. The Pillars of DSPM</h2>
+                <p>A successful DSPM program is built on a continuous cycle of four key activities:</p>
+                <ol>
+                    <li><strong>Discover:</strong> Find all the places your data lives, including known databases, data lakes, and previously unknown "shadow data" stores.</li>
+                    <li><strong>Classify:</strong> Scan the data to identify and label sensitive information (e.g., credit card numbers, personal ID numbers, health records) using classification rules.</li>
+                    <li><strong>Protect:</strong> Remediate the risks you find. This could involve removing public access, tightening user permissions, or applying encryption.</li>
+                    <li><strong>Monitor:</strong> Continuously monitor for new data stores, changes in permissions, and new security risks to maintain your security posture over time.</li>
+                </ol>
+            </section>
+
+            <section id="step1">
+                <h2>3. Step 1: Deploy a Microsoft Purview Account</h2>
+                <p>Your first step is to create a Microsoft Purview account in your Azure subscription. This will be the central hub for all your data governance and DSPM activities.</p>
+                <ol>
+                    <li>In the Azure Portal, search for and select "Microsoft Purview".</li>
+                    <li>Click <strong>+ Create</strong> to start the deployment wizard.</li>
+                    <li>Select your Subscription and Resource Group.</li>
+                    <li>Provide a unique name for your Purview account.</li>
+                    <li>Configure networking. For initial testing, you can allow access from all networks, but for production, you should use private endpoints for security.</li>
+                    <li>Review and create the account. The deployment can take around 15-30 minutes.</li>
+                </ol>
+                <p class="note">Once deployed, open the Purview account and click on the "Open Microsoft Purview governance portal" button. This is where you will perform the next steps.</p>
+            </section>
+
+            <section id="step2">
+                <h2>4. Step 2: Discover Your Data (Register & Scan Sources)</h2>
+                <p>You can't protect what you don't know you have. The next step is to tell Purview where to look for your data.</p>
+                <ol>
+                    <li>In the Purview governance portal, navigate to the <strong>Data Map</strong>.</li>
+                    <li>Select the <strong>Sources</strong> tab and click <strong>+ Register</strong>.</li>
+                    <li>Choose the type of data source you want to scan. Let's use <strong>Azure Blob Storage</strong> as an example. Click "Continue".</li>
+                    <li>Select your Azure subscription and the specific storage account you want to register. Click "Register".</li>
+                    <li>Now that the source is registered, you need to scan it. Find your new source in the list, and click the "New Scan" icon.</li>
+                    <li>Configure the scan. You will need to provide credentials for Purview to access the data. The easiest and most secure method is to use a <strong>Managed Identity</strong> for your Purview account.</li>
+                    <li>Select a "scan rule set". The system default includes a wide range of classification rules for common sensitive data types (like credit cards, IBANs, etc.).</li>
+                    <li>Set a schedule for the scan (e.g., weekly) to keep the data map up to date.</li>
+                    <li>Save and run the scan.</li>
+                </ol>
+            </section>
+
+            <section id="step3">
+                <h2>5. Step 3: Classify Your Data (Review Scan Results)</h2>
+                <p>Once the scan is complete, Purview will populate the Data Map with metadata and, most importantly, classifications.</p>
+                <ol>
+                    <li>In the Purview portal, go to the <strong>Data Catalog</strong> and browse your assets.</li>
+                    <li>Find the storage account you scanned and drill down into the files.</li>
+                    <li>Select a file that has been scanned. The "Overview" tab will show you the "Classifications" that Purview automatically applied (e.g., "EU Debit Card Number").</li>
+                    <li>You can also manually add or remove classifications if needed.</li>
+                    <li>Use the Data Catalog search to find all assets with a specific classification, for example, search for "Credit Card Number" to see every file where Purview found that data type.</li>
+                </ol>
+            </section>
+
+            <section id="step4">
+                <h2>6. Step 4: Monitor Your Posture (Use Data Estate Insights)</h2>
+                <p>DSPM is not a one-time project. Microsoft Purview provides a dashboard to monitor your posture continuously.</p>
+                <ol>
+                    <li>In the Purview portal, navigate to <strong>Data Estate Insights</strong>.</li>
+                    <li>This dashboard gives you a bird's-eye view of your data estate.</li>
+                    <li><strong>Asset Insights:</strong> See a summary of your data sources and the total number of discovered and classified assets.</li>
+                    <li><strong>Classification Insights:</strong> Review the top classification categories found across your data. This helps you understand where your most sensitive data resides (e.g., you have 500 files with financial data and 200 with personal data).</li>
+                    <li><strong>Glossary Insights:</strong> If you use the business glossary, you can see how well your data is documented.</li>
+                </ol>
+                <p class="note">Regularly review these insights to track the growth of your data estate, identify unscanned sources, and monitor trends in sensitive data discovery.</p>
+            </section>
+
+            <section id="best-practices">
+                <h2>7. Best Practices for a Successful DSPM Program</h2>
+                <ul>
+                    <li><strong>Start Small, Then Expand:</strong> Don't try to boil the ocean. Start by scanning a few critical data sources, demonstrate value, and then expand your scope.</li>
+                    <li><strong>Automate Everything:</strong> Use scheduled scans and automated classification. Manual efforts do not scale.</li>
+                    <li><strong>Focus on Remediation:</strong> Discovery is only half the battle. Create a process for acting on the findings from Purview, such as working with data owners to fix overly permissive access.</li>
+                    <li><strong>Integrate with Your Security Operations:</strong> Forward alerts and insights from Purview to your SIEM (like Microsoft Sentinel) to correlate data risks with other security signals.</li>
+                    <li><strong>Educate Data Owners:</strong> DSPM is a shared responsibility. Use Purview's insights to educate business users about their data and empower them to be better data stewards.</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
